@@ -11,23 +11,23 @@ const app = express();
 
 // ⭐ PROPER CORS CONFIG ⭐
 const allowedOrigins = [
-    "http://localhost:3003",   // local React
-    "[https://www.vnmhitechsolutions.com](https://www.vnmhitechsolutions.com)",  // main domain
-    "[https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app](https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app)",
-    "[https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app](https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app)",
-    "[https://vnm-website-backend.onrender.com](https://vnm-website-backend.onrender.com)" // Backend itself
+    "https://www.vnmhitechsolutions.com",                   // Main domain (with www)
+    "https://vnmhitechsolutions.com",                       // Main domain (without www)
+    "https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app",
+    "https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app",
+    "https://vnm-website-backend.onrender.com"              // Backend itself
 ];
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (like Postman or Server-to-Server)
+            // Allow requests with no origin (like Postman, mobile apps, or server-to-server)
             if (!origin) return callback(null, true);
 
             if (allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
-                console.log("Blocked Origin:", origin); // Debug log
+                console.log("❌ CORS Blocked Origin:", origin); // Improved debug log
                 callback(new Error("CORS blocked for origin: " + origin), false);
             }
         },
