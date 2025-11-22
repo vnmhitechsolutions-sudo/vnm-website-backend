@@ -1,18 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Contact = require('../models/Contact');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend'); // Import Resend
 
-// ✅ UPDATED: Transporter using Port 465 (SSL) to fix Render Timeout errors
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+// Initialize Resend with the key from Render
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post('/submit', async (req, res) => {
     try {
@@ -20,7 +12,7 @@ router.post('/submit', async (req, res) => {
         const newContact = new Contact(req.body);
         await newContact.save();
 
-        // 2. HTML Email Template
+        // 2. HTML Email Template (Your Dark Mode Design)
         const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #121212; color: #e0e0e0;">
             
@@ -62,20 +54,21 @@ router.post('/submit', async (req, res) => {
         </div>
         `;
 
-        const mailOptions = {
-            from: `"VNM Website Bot" <${process.env.EMAIL_USER}>`,
+        // 3. Send Email via Resend
+        // NOTE: 'from' must be 'onboarding@resend.dev' initially
+        await resend.emails.send({
+            from: 'onboarding@resend.dev', 
             to: 'vnmhitechsolutions@gmail.com', 
             subject: `New Inquiry: ${req.body.firstName} ${req.body.lastName}`,
             html: htmlContent
-        };
+        });
 
-        await transporter.sendMail(mailOptions);
         console.log(`✅ HTML Email sent for ${req.body.firstName}`);
         res.status(201).json({ message: 'Contact saved and email sent successfully!' });
 
     } catch (error) {
         console.error('❌ Error:', error);
-        res.status(500).json({ message: 'Server Error' });
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 });
 
