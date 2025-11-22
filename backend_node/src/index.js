@@ -9,27 +9,29 @@ const connectDB = require('./config/db');
 // Initialize App
 const app = express();
 
-// ⭐ ADD PROPER CORS CONFIG HERE ⭐
+// ⭐ PROPER CORS CONFIG ⭐
 const allowedOrigins = [
     "http://localhost:3003",   // local React
     "https://www.vnmhitechsolutions.com",  // main domain
     "https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app",
-    "https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app"
+    "https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app",
+    "https://vnm-website-backend.onrender.com" // Add yourself just in case
 ];
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // Allow requests with no origin (like Postman)
+            // Allow requests with no origin (like Postman or Server-to-Server)
             if (!origin) return callback(null, true);
 
             if (allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
+                console.log("Blocked Origin:", origin); // Debug log
                 callback(new Error("CORS blocked for origin: " + origin), false);
             }
         },
-        methods: ["GET", "POST"],
+        methods: ["GET", "POST", "OPTIONS"],
         credentials: true,
     })
 );
@@ -55,6 +57,12 @@ app.get('/', (req, res) => {
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(Server, `Server started on port ${PORT}`);
+
+// ✅ FIX: Assign to a variable 'server' so we can set timeouts
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server started on port ${PORT}`);
 });
+
+// ✅ ADDED: Fix for Render 502 Bad Gateway / Timeout errors
+server.keepAliveTimeout = 120000; // 120 seconds
+server.headersTimeout = 120000;   // 120 seconds
