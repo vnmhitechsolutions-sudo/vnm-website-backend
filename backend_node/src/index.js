@@ -12,10 +12,10 @@ const app = express();
 // ⭐ PROPER CORS CONFIG ⭐
 const allowedOrigins = [
     "http://localhost:3003",   // local React
-    "https://www.vnmhitechsolutions.com",  // main domain
-    "https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app",
-    "https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app",
-    "https://vnm-website-backend.onrender.com" // Backend itself
+    "[https://www.vnmhitechsolutions.com](https://www.vnmhitechsolutions.com)",  // main domain
+    "[https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app](https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app)",
+    "[https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app](https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app)",
+    "[https://vnm-website-backend.onrender.com](https://vnm-website-backend.onrender.com)" // Backend itself
 ];
 
 app.use(

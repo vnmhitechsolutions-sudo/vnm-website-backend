@@ -1,18 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { JobListing, Application } = require('../models/Job');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend'); // Import Resend
 
-// ✅ UPDATED: Transporter using Port 465 (SSL) to fix Render Timeout errors
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+// Initialize Resend with the key from Render
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // GET all job listings
 router.get('/jobs', async (req, res) => {
@@ -83,8 +75,9 @@ router.post('/apply', async (req, res) => {
         </div>
         `;
 
-        await transporter.sendMail({
-            from: `"VNM Careers" <${process.env.EMAIL_USER}>`,
+        // 3. Send Email via Resend
+        await resend.emails.send({
+            from: 'onboarding@resend.dev', 
             to: 'vnmhitechsolutions@gmail.com', 
             subject: `New Application: ${req.body.name} - ${req.body.position}`,
             html: htmlContent 
@@ -100,4 +93,3 @@ router.post('/apply', async (req, res) => {
 });
 
 module.exports = router;
-// Updated email settings for Render
