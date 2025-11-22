@@ -15,7 +15,7 @@ const allowedOrigins = [
     "https://www.vnmhitechsolutions.com",  // main domain
     "https://vnm-website-git-main-vnmhitechsolutions-sudos-projects.vercel.app",
     "https://vnm-website-f8ms13oec-vnmhitechsolutions-sudos-projects.vercel.app",
-    "https://vnm-website-backend.onrender.com" // Add yourself just in case
+    "https://vnm-website-backend.onrender.com" // Backend itself
 ];
 
 app.use(
@@ -58,7 +58,7 @@ app.get('/', (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 5000;
 
-// ✅ FIX: Assign to a variable 'server' so we can set timeouts
+// ✅ FIX: Assign to a variable 'server' (Lowercase 's')
 const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server started on port ${PORT}`);
 });
