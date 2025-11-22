@@ -3,8 +3,11 @@ const router = express.Router();
 const { JobListing, Application } = require('../models/Job');
 const nodemailer = require('nodemailer');
 
+// ✅ UPDATED: Transporter using Port 465 (SSL) to fix Render Timeout errors
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
@@ -84,9 +87,10 @@ router.post('/apply', async (req, res) => {
             from: `"VNM Careers" <${process.env.EMAIL_USER}>`,
             to: 'vnmhitechsolutions@gmail.com', 
             subject: `New Application: ${req.body.name} - ${req.body.position}`,
-            html: htmlContent // This ensures the HTML format is sent
+            html: htmlContent 
         });
 
+        console.log(`✅ HTML Email sent for Application: ${req.body.name}`);
         res.status(201).json({ message: 'Application submitted successfully!' });
 
     } catch (err) {
@@ -96,3 +100,4 @@ router.post('/apply', async (req, res) => {
 });
 
 module.exports = router;
+// Updated email settings for Render

@@ -3,8 +3,11 @@ const router = express.Router();
 const { Course, Enrollment } = require('../models/Course');
 const nodemailer = require('nodemailer');
 
+// ✅ UPDATED: Transporter using Port 465 (SSL) to fix Render Timeout errors
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
@@ -28,7 +31,7 @@ router.post('/enroll', async (req, res) => {
         const newEnrollment = new Enrollment(req.body);
         await newEnrollment.save();
 
-        // 2. HTML Email Template (Dark Mode Style matching your screenshot)
+        // 2. HTML Email Template (Dark Mode Style)
         const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #121212; color: #e0e0e0;">
             
