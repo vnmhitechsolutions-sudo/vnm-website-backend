@@ -1,18 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Course, Enrollment } = require('../models/Course');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend'); // Import Resend
 
-// ✅ UPDATED: Transporter using Port 465 (SSL) to fix Render Timeout errors
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+// Initialize Resend with the key from Render
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // GET all courses
 router.get('/list', async (req, res) => {
@@ -31,7 +23,7 @@ router.post('/enroll', async (req, res) => {
         const newEnrollment = new Enrollment(req.body);
         await newEnrollment.save();
 
-        // 2. HTML Email Template (Dark Mode Style)
+        // 2. HTML Email Template (Adapted Dark Mode Design)
         const htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #121212; color: #e0e0e0;">
             
@@ -56,7 +48,7 @@ router.post('/enroll', async (req, res) => {
                     </tr>
                     <tr style="border-bottom: 1px solid #333;">
                         <td style="padding: 10px; font-weight: bold; color: #888;">Location:</td>
-                        <td style="padding: 10px;">${req.body.location}</td>
+                        <td style="padding: 10px;">${req.body.country || req.body.location}</td> 
                     </tr>
                     <tr style="border-bottom: 1px solid #333;">
                         <td style="padding: 10px; font-weight: bold; color: #888;">Selected Course:</td>
@@ -83,22 +75,20 @@ router.post('/enroll', async (req, res) => {
         </div>
         `;
 
-        const mailOptions = {
-            from: `"Course Enrollment Bot" <${process.env.EMAIL_USER}>`,
+        // 3. Send Email via Resend
+        await resend.emails.send({
+            from: 'onboarding@resend.dev', // Must be this until domain is verified
             to: 'vnmhitechsolutions@gmail.com', 
             subject: `New Enrollment: ${req.body.name} - ${req.body.courseName}`,
-            html: htmlContent 
-        };
-
-        // Send the email
-        await transporter.sendMail(mailOptions);
+            html: htmlContent
+        });
         
         console.log(`✅ HTML Email sent for Enrollment: ${req.body.name}`);
         res.status(201).json({ message: 'Enrollment successful and email sent!' });
 
     } catch (err) {
         console.error('❌ Error:', err);
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: 'Server Error', error: err.message });
     }
 });
 
